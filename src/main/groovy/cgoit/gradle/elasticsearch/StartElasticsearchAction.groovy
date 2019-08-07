@@ -86,7 +86,8 @@ class StartElasticsearchAction {
                 "${optPrefix}http.port=$httpPort",
                 "${optPrefix}transport.tcp.port=$transportPort",
                 "${optPrefix}path.data=$dataDir",
-                "${optPrefix}path.logs=$logsDir"
+                "${optPrefix}path.logs=$logsDir",
+                "${optPrefix}xpack.ml.enabled=false"
         ]
 
         if (!isFamily(FAMILY_WINDOWS)) {

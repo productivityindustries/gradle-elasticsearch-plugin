@@ -125,7 +125,6 @@ class ElasticsearchActions {
             }
             ant.chmod(file: new File("$home/bin/elasticsearch"), perm: "+x")
             ant.chmod(file: new File("$home/bin/plugin"), perm: "+x")
-            ant.chmod(file: new File("$home/modules/x-pack-ml/platform/linux-x86_64/bin/controller"), perm: "+x")
         }
 
         new File("$home/version.txt") << "$version"
