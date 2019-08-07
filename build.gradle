@@ -4,26 +4,26 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.gradle.publish:plugin-publish-plugin:0.9.7"
+        classpath "com.gradle.publish:plugin-publish-plugin:0.10.1"
     }
 }
 
 plugins {
-    id "com.jfrog.bintray" version "1.6"
+    id "com.jfrog.bintray" version "1.8.4"
 }
 
-group = "ajk.gradle.elastic"
-version = "0.0.20"
+group = "cgoit.gradle.elasticsearch"
+version = "0.0.21"
 
-String repoName = 'bilberry'
+String repoName = 'gradle-elasticsearch-plugin'
 
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: "com.gradle.plugin-publish"
 
 compileGroovy {
-    sourceCompatibility = '1.7'
-    targetCompatibility = '1.7'
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
 }
 
 repositories {
@@ -33,8 +33,8 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile "de.undercouch:gradle-download-task:3.1.0"
-    compile "org.apache.httpcomponents:fluent-hc:4.5.2"
+    compile "de.undercouch:gradle-download-task:4.0.0"
+    compile "org.apache.httpcomponents:fluent-hc:4.5.9"
 }
 
 task sourcesJar(type: Jar) {
@@ -90,9 +90,9 @@ bintray {
     pkg {
         repo = 'maven'
         name = project.name
-        websiteUrl = "https://github.com/amirkibbar/$repoName"
-        issueTrackerUrl = "https://github.com/amirkibbar/$repoName/issues"
-        vcsUrl = "https://github.com/amirkibbar/${repoName}.git"
+        websiteUrl = "https://github.com/cgoIT/$repoName"
+        issueTrackerUrl = "https://github.com/cgoIT/$repoName/issues"
+        vcsUrl = "https://github.com/cgoIT/${repoName}.git"
         licenses = ['Apache-2.0']
         labels = ['gradle', 'plugin', 'elastic', 'ElasticSearch', repoName]
         version {
@@ -102,8 +102,8 @@ bintray {
 }
 
 pluginBundle {
-    website = "https://github.com/amirkibbar/$repoName"
-    vcsUrl = "https://github.com/amirkibbar/${repoName}.git"
+    website = "https://github.com/cgoIT/$repoName"
+    vcsUrl = "https://github.com/cgoIT/${repoName}.git"
     description = 'an ElasticSearch plugin for gradle to help running ElasticSearch during integration test'
     tags = ['elastic', 'ElasticSearch']
 

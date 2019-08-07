@@ -1,26 +1,35 @@
-package ajk.gradle.elastic
+package cgoit.gradle.elasticsearch
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
-import static ajk.gradle.elastic.ElasticPlugin.*
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.CYAN
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_HOST
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_VERSION
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.NORMAL
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.RED
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.YELLOW
 import static org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS
 import static org.apache.tools.ant.taskdefs.condition.Os.isFamily
 
-class StartElasticAction {
+class StartElasticsearchAction {
 
     @Input
     @Optional
-    String elasticVersion
+    String elasticsearchVersion
 
     @Input
     @Optional
-    int httpPort
+    String httpHost
 
     @Input
     @Optional
-    int transportPort
+    Integer httpPort
+
+    @Input
+    @Optional
+    Integer transportPort
 
     @Input
     @Optional
@@ -38,14 +47,15 @@ class StartElasticAction {
 
     private AntBuilder ant
 
-    StartElasticAction(Project project) {
+    StartElasticsearchAction(Project project) {
         this.project = project
         this.ant = project.ant
     }
 
     void execute() {
         File toolsDir = toolsDir ?: new File("$project.rootDir/gradle/tools")
-        ElasticActions elastic = new ElasticActions(project, toolsDir, elasticVersion ?: DEFAULT_ELASTIC_VERSION)
+        ElasticsearchActions elastic = new ElasticsearchActions(project, toolsDir,
+                elasticsearchVersion ?: DEFAULT_ELASTICSEARCH_VERSION)
 
         elastic.install()
 
@@ -69,7 +79,7 @@ class StartElasticAction {
         logsDir.mkdirs()
         dataDir.mkdirs()
 
-        def optPrefix = Integer.valueOf( elastic.version.split( "\\." )[0]) >= 5 ? "-E" : "-Des."
+        def optPrefix = Integer.valueOf(elastic.version.split("\\.")[0]) >= 5 ? "-E" : "-Des."
         File esScript = new File("${elastic.home}/bin/elasticsearch${isFamily(FAMILY_WINDOWS) ? '.bat' : ''}")
         def command = [
                 esScript.absolutePath,
@@ -86,18 +96,18 @@ class StartElasticAction {
         }
 
         def esEnv = [
-            "JAVA_HOME=${System.properties['java.home']}",
-            "ES_HOME=$elastic.home"
+                "JAVA_HOME=${System.properties['java.home']}",
+                "ES_HOME=$elastic.home"
         ]
 
-        if (Integer.valueOf( elastic.version.split( "\\." )[0]) >= 5) {
+        if (Integer.valueOf(elastic.version.split("\\.")[0]) >= 5) {
             esEnv += [
-                "ES_JAVA_OPTS=-Xms128m -Xmx512m"
+                    "ES_JAVA_OPTS=-Xms128m -Xmx512m"
             ]
         } else {
             esEnv += [
-                "ES_MAX_MEM=512m",
-                "ES_MIN_MEM=128m"
+                    "ES_MAX_MEM=512m",
+                    "ES_MIN_MEM=128m"
             ]
         }
 
@@ -109,8 +119,8 @@ class StartElasticAction {
         println "${CYAN}* elastic:$NORMAL waiting for ElasticSearch to start"
         ant.waitfor(maxwait: 2, maxwaitunit: "minute", timeoutproperty: "elasticTimeout") {
             and {
-                socket(server: "localhost", port: transportPort)
-                ant.http(url: "http://localhost:$httpPort")
+                socket(server: "${httpHost ?: DEFAULT_ELASTICSEARCH_HOST}", port: transportPort)
+                ant.http(url: "http://${httpHost ?: DEFAULT_ELASTICSEARCH_HOST}:$httpPort")
             }
         }
 

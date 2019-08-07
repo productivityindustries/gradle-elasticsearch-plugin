@@ -1,8 +1,12 @@
-# gradle-elastic-plugin
+# gradle-elasticsearch-plugin
 an ElasticSearch gradle plugin for integration tests with ElasticSearch
 
-[ ![Build Status](https://travis-ci.org/amirkibbar/bilberry.svg?branch=master) ](https://travis-ci.org/amirkibbar/bilberry)
-[ ![Download](https://api.bintray.com/packages/amirk/maven/gradle-elastic-plugin/images/download.svg) ](https://bintray.com/amirk/maven/gradle-elastic-plugin/_latestVersion)
+[ ![Build Status](https://travis-ci.org/cgoIT/gradle-elasticsearch-plugin.svg?branch=master) ](https://travis-ci.org/amirkibbar/bilberry)
+[ ![Download](https://api.bintray.com/packages/cgoIT/maven/gradle-elasticsearch-plugin/images/download.svg) ](https://bintray.com/cgoIT/maven/gradle-elasticsearch-plugin/_latestVersion)
+
+# A big thx
+
+A big thx to the author of the original plugin which can be found [here](https://github.com/amirkibbar/bilberry).
 
 # Using
 
@@ -11,7 +15,7 @@ Plugin setup with gradle >= 2.1:
 ```gradle
 
     plugins {
-        id "ajk.gradle.elastic" version "0.0.20"
+        id "cgoit.gradle.elasticsearch" version "0.0.21"
     }
 ```
 
@@ -22,10 +26,10 @@ Plugin setup with gradle < 2.1:
     buildscript {
         repositories {
             jcenter()
-            maven { url "http://dl.bintray.com/amirk/maven" }
+            maven { url "http://dl.bintray.com/cgoit/maven" }
         }
         dependencies {
-            classpath("ajk.gradle.elastic:gradle-elastic-plugin:0.0.20")
+            classpath("cgoit.gradle.elasticsearch:gradle-elasticsearch-plugin:0.0.21")
         }
     }
 
@@ -45,7 +49,7 @@ Plugin setup with gradle < 2.1:
 
       doFirst {
         startElastic {
-          elasticVersion = "5.1.2"
+          elasticVersion = "7.3.0"
           httpPort = 9200
           transportPort = 9300
           dataDir = file("$buildDir/elastic")

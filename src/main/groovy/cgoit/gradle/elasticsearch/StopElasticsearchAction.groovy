@@ -1,14 +1,23 @@
-package ajk.gradle.elastic
+package cgoit.gradle.elasticsearch
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
-import static ajk.gradle.elastic.ElasticPlugin.*
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_HOST
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.CYAN
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_VERSION
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.NORMAL
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.RED
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.YELLOW
 import static org.apache.http.client.fluent.Executor.newInstance
 import static org.apache.http.client.fluent.Request.Post
 
-class StopElasticAction {
+class StopElasticsearchAction {
+
+    @Input
+    @Optional
+    private String httpHost
 
     @Input
     @Optional
@@ -25,19 +34,20 @@ class StopElasticAction {
     private AntBuilder ant
     private Project project
 
-    StopElasticAction(Project project) {
+    StopElasticsearchAction(Project project) {
         this.project = project
         this.ant = project.ant
     }
 
     void execute() {
         File toolsDir = toolsDir ?: new File("$project.rootDir/gradle/tools")
-        ElasticActions elastic = new ElasticActions(project, toolsDir, elasticVersion ?: DEFAULT_ELASTIC_VERSION)
+        ElasticsearchActions elastic = new ElasticsearchActions(project, toolsDir,
+                elasticVersion ?: DEFAULT_ELASTICSEARCH_VERSION)
 
         println "${CYAN}* elastic:$NORMAL stopping ElasticSearch"
 
         try {
-            if (Integer.valueOf( elastic.version.split( "\\." )[0]) >= 2) {
+            if (Integer.valueOf(elastic.version.split("\\.")[0]) >= 2) {
                 def pidFile = new File(elastic.home, 'elastic.pid')
                 if (!pidFile.exists()) {
                     println "${RED}* elastic:$NORMAL ${pidFile} not found"
@@ -49,13 +59,14 @@ class StopElasticAction {
 
                 "kill $elasticPid".execute()
             } else {
-                newInstance().execute(Post("http://localhost:${httpPort ?: 9200}/_shutdown"))
+                newInstance().
+                        execute(Post("http://${httpHost ?: DEFAULT_ELASTICSEARCH_HOST}:${httpPort ?: 9200}/_shutdown"))
             }
 
             println "${CYAN}* elastic:$NORMAL waiting for ElasticSearch to shutdown"
             ant.waitfor(maxwait: 2, maxwaitunit: "minute", timeoutproperty: "elasticTimeout") {
                 not {
-                    ant.http(url: "http://localhost:${httpPort ?: 9200}")
+                    ant.http(url: "http://${httpHost ?: DEFAULT_ELASTICSEARCH_HOST}:${httpPort ?: 9200}")
                 }
             }
 
