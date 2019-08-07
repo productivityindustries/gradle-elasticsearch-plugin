@@ -33,7 +33,7 @@ Plugin setup with gradle < 2.1:
         }
     }
 
-    apply plugin: 'ajk.gradle.elastic'
+    apply plugin: 'cgoit.gradle.elasticsearch'
 ```
 
 # Starting and stopping ElasticSearch during the integration tests
@@ -49,7 +49,8 @@ Plugin setup with gradle < 2.1:
 
       doFirst {
         startElastic {
-          elasticVersion = "7.3.0"
+          elasticsearchVersion = "7.3.0"
+          httpHost = "localhost"
           httpPort = 9200
           transportPort = 9300
           dataDir = file("$buildDir/elastic")
@@ -59,6 +60,7 @@ Plugin setup with gradle < 2.1:
   
       doLast {
         stopElastic {
+          httpHost = "localhost"
           httpPort = 9200
         }
       }
@@ -67,6 +69,7 @@ Plugin setup with gradle < 2.1:
     gradle.taskGraph.afterTask { Task task, TaskState taskState ->
       if (task.name == "integrationTests") {
         stopElastic {
+          httpHost = "localhost"
           httpPort = 9200
         }
       }
