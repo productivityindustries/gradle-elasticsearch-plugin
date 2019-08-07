@@ -95,7 +95,7 @@ class ElasticsearchActions {
         }
 
         String elasticPackage = isFamily(FAMILY_WINDOWS) ? winUrl : linuxUrl
-        File elasticFile = new File("$toolsDir/elastic-${version}.zip")
+        File elasticFile = new File("$toolsDir/elastic-${version}.${isFamily(FAMILY_WINDOWS) ? 'zip' : 'tar.gz'}")
 
         DownloadAction elasticDownload = new DownloadAction(project)
         elasticDownload.dest(elasticFile)

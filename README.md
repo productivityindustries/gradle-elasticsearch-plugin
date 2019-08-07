@@ -48,7 +48,7 @@ Plugin setup with gradle < 2.1:
       include "**/*IT.*"
 
       doFirst {
-        startElastic {
+        startElasticsearch {
           elasticsearchVersion = "7.3.0"
           httpHost = "localhost"
           httpPort = 9200
@@ -59,7 +59,7 @@ Plugin setup with gradle < 2.1:
       }
   
       doLast {
-        stopElastic {
+        stopElasticsearch {
           httpHost = "localhost"
           httpPort = 9200
         }
@@ -68,7 +68,7 @@ Plugin setup with gradle < 2.1:
     
     gradle.taskGraph.afterTask { Task task, TaskState taskState ->
       if (task.name == "integrationTests") {
-        stopElastic {
+        stopElasticsearch {
           httpHost = "localhost"
           httpPort = 9200
         }
