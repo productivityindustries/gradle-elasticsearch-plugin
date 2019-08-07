@@ -96,12 +96,21 @@ class ElasticsearchActions {
 
         String elasticPackage = isFamily(FAMILY_WINDOWS) ? winUrl : linuxUrl
         File elasticFile = new File("$toolsDir/elastic-${version}.${isFamily(FAMILY_WINDOWS) ? 'zip' : 'tar.gz'}")
+        File elasticFilePart = new File("$toolsDir/elastic-${version}.${isFamily(FAMILY_WINDOWS) ? 'zip' : 'tar.gz'}.part")
+
+        ant.delete(quiet: true) {
+            fileset(dir: toolsDir) {
+                include(name: "**/*.part")
+            }
+        }
 
         DownloadAction elasticDownload = new DownloadAction(project)
-        elasticDownload.dest(elasticFile)
+        elasticDownload.dest(elasticFilePart)
         elasticDownload.src(elasticPackage)
         elasticDownload.onlyIfNewer(true)
         elasticDownload.execute()
+
+        ant.rename(src: elasticFilePart, dest: elasticFile, replace: true)
 
         ant.delete(dir: home, quiet: true)
         home.mkdirs()
