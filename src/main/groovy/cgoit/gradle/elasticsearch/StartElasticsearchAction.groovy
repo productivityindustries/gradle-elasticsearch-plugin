@@ -90,6 +90,8 @@ class StartElasticsearchAction {
                 "${optPrefix}xpack.ml.enabled=false"
         ]
 
+        println "${CYAN}* elastic:$NORMAL start ElasticSearch with parameters: ${command.toListString()}"
+
         if (!isFamily(FAMILY_WINDOWS)) {
             command += [
                     "-p${pidFile}"
