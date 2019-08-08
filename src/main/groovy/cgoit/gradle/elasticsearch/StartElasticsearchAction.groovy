@@ -3,10 +3,13 @@ package cgoit.gradle.elasticsearch
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
+import org.gradle.internal.impldep.org.apache.commons.lang.BooleanUtils
 
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.CYAN
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.CYAN
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_HOST
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_VERSION
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.NORMAL
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.NORMAL
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.RED
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.YELLOW
@@ -43,6 +46,10 @@ class StartElasticsearchAction {
     @Optional
     File logsDir
 
+    @Input
+    @Optional
+    Boolean forceShutdownBeforeStart = Boolean.FALSE
+
     private Project project
 
     private AntBuilder ant
@@ -59,17 +66,27 @@ class StartElasticsearchAction {
 
         elastic.install()
 
-        def pidFile = new File(elastic.home, 'elastic.pid')
-        if (pidFile.exists()) {
-            println "${YELLOW}* elastic:$NORMAL ElasticSearch seems to be running at pid ${pidFile.text}"
-            println "${YELLOW}* elastic:$NORMAL please check $pidFile"
-            return
-        }
-
         httpPort = httpPort ?: 9200
         transportPort = transportPort ?: 9300
         dataDir = dataDir ?: new File("$project.buildDir/elastic")
         logsDir = logsDir ?: new File("$dataDir/logs")
+        def pidFile = new File(elastic.home, 'elastic.pid')
+        if (pidFile.exists()) {
+            if (BooleanUtils.isFalse(forceShutdownBeforeStart)) {
+                println "${YELLOW}* elastic:$NORMAL ElasticSearch seems to be running at pid ${pidFile.text}"
+                println "${YELLOW}* elastic:$NORMAL please check $pidFile"
+                return
+            } else {
+                println "${CYAN}* elastic:$NORMAL ElasticSearch seems to be running at pid ${pidFile.text} and 'forceShutdownBeforeStart=true'"
+                new StopElasticsearchAction(project)
+                        .withElasticVersion(elasticsearchVersion)
+                        .withToolsDir(toolsDir)
+                        .withHttpHost(httpHost)
+                        .withHttpPort(httpPort)
+                        .execute()
+            }
+        }
+
         println "${CYAN}* elastic:$NORMAL starting ElasticSearch at $elastic.home using http port $httpPort and tcp transport port $transportPort"
         println "${CYAN}* elastic:$NORMAL ElasticSearch data directory: $dataDir"
         println "${CYAN}* elastic:$NORMAL ElasticSearch logs directory: $logsDir"

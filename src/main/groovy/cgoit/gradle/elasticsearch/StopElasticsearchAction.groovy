@@ -80,4 +80,24 @@ class StopElasticsearchAction {
             println "${CYAN}* elastic:$YELLOW warning - unable to stop elastic on http port ${httpPort ?: 9200}, ${e.message}$NORMAL"
         }
     }
+
+    StopElasticsearchAction withToolsDir(File toolsDir) {
+        this.toolsDir = toolsDir
+        return this
+    }
+
+    StopElasticsearchAction withElasticVersion(String elasticVersion) {
+        this.elasticVersion = elasticVersion
+        return this
+    }
+
+    StopElasticsearchAction withHttpHost(String httpHost) {
+        this.httpHost = httpHost
+        return this
+    }
+
+    StopElasticsearchAction withHttpPort(Integer httpPort) {
+        this.httpPort = httpPort
+        return this
+    }
 }
