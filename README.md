@@ -1,5 +1,5 @@
 # gradle-elasticsearch-plugin
-an ElasticSearch gradle plugin for integration tests with ElasticSearch
+An ElasticSearch gradle plugin for starting an ElasticSearch within a gradle build.
 
 [ ![Build Status](https://travis-ci.org/cgoIT/gradle-elasticsearch-plugin.svg?branch=master) ](https://travis-ci.org/amirkibbar/bilberry)
 [ ![Download](https://api.bintray.com/packages/cgoit/maven/gradle-elasticsearch-plugin/images/download.svg) ](https://bintray.com/cgoIT/maven/gradle-elasticsearch-plugin/_latestVersion)
