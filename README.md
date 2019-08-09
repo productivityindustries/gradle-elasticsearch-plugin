@@ -15,7 +15,7 @@ Plugin setup with gradle >= 2.1:
 ```gradle
 
     plugins {
-        id "cgoit.gradle.elasticsearch" version "0.0.21"
+        id "cgoit.gradle.elasticsearch" version "0.1.0"
     }
 ```
 
@@ -29,7 +29,7 @@ Plugin setup with gradle < 2.1:
             maven { url "http://dl.bintray.com/cgoit/maven" }
         }
         dependencies {
-            classpath("cgoit.gradle.elasticsearch:gradle-elasticsearch-plugin:0.0.21")
+            classpath("cgoit.gradle.elasticsearch:gradle-elasticsearch-plugin:0.1.0")
         }
     }
 
