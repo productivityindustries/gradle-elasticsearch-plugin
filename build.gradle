@@ -105,7 +105,7 @@ bintray {
 pluginBundle {
     website = "https://github.com/cgoIT/$repoName"
     vcsUrl = "https://github.com/cgoIT/${repoName}.git"
-    description = 'an ElasticSearch plugin for gradle to help running ElasticSearch during integration test'
+    description = 'An ElasticSearch gradle plugin for starting an ElasticSearch within a gradle build.'
     tags = ['elastic', 'ElasticSearch']
 
     plugins {
