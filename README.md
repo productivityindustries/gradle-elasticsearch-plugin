@@ -50,6 +50,7 @@ Plugin setup with gradle < 2.1:
       doFirst {
         startElasticsearch {
           elasticsearchVersion = "7.3.0"
+          httpScheme = "http"
           httpHost = "localhost"
           httpPort = 9200
           transportPort = 9300
@@ -61,6 +62,7 @@ Plugin setup with gradle < 2.1:
   
       doLast {
         stopElasticsearch {
+          httpScheme = "http"
           httpHost = "localhost"
           httpPort = 9200
         }
@@ -70,6 +72,7 @@ Plugin setup with gradle < 2.1:
     gradle.taskGraph.afterTask { Task task, TaskState taskState ->
       if (task.name == "integrationTests") {
         stopElasticsearch {
+          httpScheme = "http"
           httpHost = "localhost"
           httpPort = 9200
         }

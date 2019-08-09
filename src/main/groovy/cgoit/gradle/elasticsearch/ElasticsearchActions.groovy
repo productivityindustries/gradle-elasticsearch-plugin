@@ -1,10 +1,15 @@
 package cgoit.gradle.elasticsearch
 
 import de.undercouch.gradle.tasks.download.DownloadAction
+import groovy.json.JsonSlurper
 import org.gradle.api.Project
 
-import static ElasticsearchPlugin.CYAN
-import static ElasticsearchPlugin.NORMAL
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.CYAN
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.NORMAL
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.RED
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.YELLOW
+import static org.apache.http.client.fluent.Executor.newInstance
+import static org.apache.http.client.fluent.Request.Post
 import static org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS
 import static org.apache.tools.ant.taskdefs.condition.Os.isFamily
 
@@ -14,19 +19,139 @@ class ElasticsearchActions {
     Project project
     AntBuilder ant
     File home
+    String httpScheme
+    String httpHost
+    Integer httpPort
+    File pidFile
 
-    ElasticsearchActions(Project project, File toolsDir, String version) {
+    ElasticsearchActions(Project project, File toolsDir, String version,
+            String httpScheme, String httpHost, Integer httpPort, File pidFile) {
         this.project = project
         this.toolsDir = toolsDir
         this.version = version
         this.ant = project.ant
         home = new File("$toolsDir/elastic")
+        this.httpScheme = httpScheme
+        this.httpHost = httpHost
+        this.httpPort = httpPort
+        this.pidFile = pidFile
+    }
+
+    boolean isRunning(maxWait = 10) {
+        def url = "${httpScheme}://${httpHost}:$httpPort"
+        def wait = 0
+        def running = false
+        while (!running && wait <= maxWait) {
+            try {
+                url.toURL().openConnection().with {
+                    connectTimeout = 2000
+                    if (responseCode == 200) {
+                        running = true
+                    }
+                    disconnect()
+                }
+            } catch (e) { }
+            sleep(2000)
+            wait += 2
+        }
+
+        running
+    }
+
+    boolean waitForShutdown(maxWait = 10) {
+        def url = "${httpScheme}://${httpHost}:$httpPort"
+        def wait = 0
+        def shutdown = false
+        while (!shutdown && wait <= maxWait) {
+            try {
+                url.toURL().openConnection().with {
+                    connectTimeout = 2000
+                    println "${CYAN}* elastic:$NORMAL wait ${maxWait - wait} more seconds for shutdown, responseCode=${responseCode}"
+                    disconnect()
+                }
+            } catch (e) {
+                shutdown = true
+            }
+            sleep(2000)
+            wait += 2
+        }
+
+        shutdown
+    }
+
+    String getPid() {
+        String pid
+        def status
+        try {
+            status = new JsonSlurper().parse(new URL("${httpScheme}://${httpHost}:${httpPort}/_nodes/process"))
+        } catch (ConnectException e) {
+        }
+
+        if (status) {
+            def nodes = status?."nodes"
+            if (nodes) {
+                nodes.find { k, v ->
+                    pid = v."process"?."id"
+                    if (pid) {
+                        return true
+                    }
+                }
+            }
+        }
+
+        pid
+    }
+
+    boolean stopRunning() {
+        println "${CYAN}* elastic:$NORMAL stopping ElasticSearch"
+
+        try {
+            if (Integer.valueOf(version.split("\\.")[0]) >= 2) {
+                def elasticPid
+                if (pidFile.exists()) {
+                    elasticPid = pidFile.text
+                    ant.delete(failonerror: true, file: pidFile)
+                } else {
+                    elasticPid = getPid()
+                }
+
+                if (!elasticPid) {
+                    println "${RED}* elastic:$NORMAL could not get pid of running ElasticSearch!"
+                    println "${RED}* elastic:$NORMAL could not stop ElasticSearch, please check manually!"
+                    return false
+                }
+                println "${CYAN}* elastic:$NORMAL going to kill pid $elasticPid"
+
+                if (isFamily(FAMILY_WINDOWS)) {
+                    "taskkill /F /PID $elasticPid".execute()
+                } else {
+                    "kill $elasticPid".execute()
+                }
+            } else {
+                newInstance().
+                        execute(Post("${httpScheme}://${httpHost}:${httpPort}/_shutdown"))
+            }
+
+            println "${CYAN}* elastic:$NORMAL waiting for ElasticSearch to shutdown"
+            boolean shutdown = waitForShutdown(120)
+
+            if (!shutdown) {
+                println "${RED}* elastic:$NORMAL could not stop ElasticSearch"
+                return false
+            }
+
+            println "${CYAN}* elastic:$NORMAL ElasticSearch is now down"
+        } catch (ConnectException e) {
+            println "${CYAN}* elastic:$YELLOW warning - unable to stop elastic on http port ${httpPort}, ${e.message}$NORMAL"
+            return false
+        }
+        return true
     }
 
     boolean isInstalled() {
-      if (!new File("$home/bin/elasticsearch").exists()) {
-        return false
-      }
+        if (!new File("$home/bin/elasticsearch").exists()) {
+            return false
+        }
 
         boolean desiredVersion = isDesiredVersion()
 
@@ -44,13 +169,13 @@ class ElasticsearchActions {
         println "${CYAN}* elastic:$NORMAL checking existing version"
 
         def versionFile = new File("$home/version.txt")
-      if (!versionFile.exists()) {
-        return false
-      }
+        if (!versionFile.exists()) {
+            return false
+        }
 
         def detectedVersion = versionFile.text
 
-        println "${CYAN}* elastic:$NORMAL: detected version: $detectedVersion"
+        println "${CYAN}* elastic:$NORMAL detected version: $detectedVersion"
 
         return detectedVersion.contains(version)
     }
@@ -96,7 +221,8 @@ class ElasticsearchActions {
 
         String elasticPackage = isFamily(FAMILY_WINDOWS) ? winUrl : linuxUrl
         File elasticFile = new File("$toolsDir/elastic-${version}.${isFamily(FAMILY_WINDOWS) ? 'zip' : 'tar.gz'}")
-        File elasticFilePart = new File("$toolsDir/elastic-${version}.${isFamily(FAMILY_WINDOWS) ? 'zip' : 'tar.gz'}.part")
+        File elasticFilePart = new File(
+                "$toolsDir/elastic-${version}.${isFamily(FAMILY_WINDOWS) ? 'zip' : 'tar.gz'}.part")
 
         ant.delete(quiet: true) {
             fileset(dir: toolsDir) {
