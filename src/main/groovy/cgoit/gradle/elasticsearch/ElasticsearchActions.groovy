@@ -166,7 +166,7 @@ class ElasticsearchActions {
     }
 
     boolean isDesiredVersion() {
-        println "${CYAN}* elastic:$NORMAL checking existing version"
+        println "${CYAN}* elastic:$NORMAL check if existing version is $version"
 
         def versionFile = new File("$home/version.txt")
         if (!versionFile.exists()) {
@@ -177,7 +177,7 @@ class ElasticsearchActions {
 
         println "${CYAN}* elastic:$NORMAL detected version: $detectedVersion"
 
-        return detectedVersion.contains(version)
+        return detectedVersion.trim() == version
     }
 
     void install() {
