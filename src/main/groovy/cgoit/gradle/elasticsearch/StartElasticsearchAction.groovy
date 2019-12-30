@@ -12,6 +12,7 @@ import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEAR
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_SCHEME
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_TRANSPORT_PORT
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_VERSION
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_VERSION
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.NORMAL
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.RED
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.YELLOW
@@ -67,6 +68,7 @@ class StartElasticsearchAction {
 
     void execute() {
         File toolsDir = toolsDir ?: new File("$project.rootDir/gradle/tools")
+        elasticsearchVersion = elasticsearchVersion ?: DEFAULT_ELASTICSEARCH_VERSION
         httpScheme = httpScheme ?: DEFAULT_ELASTICSEARCH_SCHEME
         httpHost = httpHost ?: DEFAULT_ELASTICSEARCH_HOST
         httpPort = httpPort ?: DEFAULT_ELASTICSEARCH_PORT
@@ -77,8 +79,7 @@ class StartElasticsearchAction {
         File pidFile = new File(toolsDir, 'elastic/elastic.pid')
 
         ElasticsearchActions elastic = new ElasticsearchActions(project, toolsDir,
-                elasticsearchVersion ?: DEFAULT_ELASTICSEARCH_VERSION,
-                httpScheme, httpHost, httpPort, pidFile)
+                elasticsearchVersion, httpScheme, httpHost, httpPort, pidFile)
 
         elastic.install()
 

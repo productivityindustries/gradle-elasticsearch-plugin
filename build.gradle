@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "cgoit.gradle.elasticsearch"
-version = "0.1.1"
+version = "0.2.0"
 
 String repoName = 'gradle-elasticsearch-plugin'
 
@@ -33,8 +33,8 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile "de.undercouch:gradle-download-task:4.0.0"
-    compile "org.apache.httpcomponents:fluent-hc:4.5.9"
+    compile "de.undercouch:gradle-download-task:4.0.2"
+    compile "org.apache.httpcomponents:fluent-hc:4.5.10"
     compile "com.kstruct:gethostname4j:0.0.3"
 }
 
@@ -120,10 +120,6 @@ pluginBundle {
         artifactId = project.name
         version = project.version
     }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = 3.5
 }
 
 bintrayUpload.dependsOn = [sourcesJar]
