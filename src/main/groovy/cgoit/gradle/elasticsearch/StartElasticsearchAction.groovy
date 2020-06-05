@@ -114,6 +114,7 @@ class StartElasticsearchAction {
                 "${optPrefix}http.port=$httpPort",
                 "${optPrefix}transport.tcp.port=$transportPort",
                 "${optPrefix}path.data=$dataDir",
+                "${optPrefix}path.repo=$dataDir/repo",
                 "${optPrefix}path.logs=$logsDir",
                 "${optPrefix}xpack.ml.enabled=false"
         ]
