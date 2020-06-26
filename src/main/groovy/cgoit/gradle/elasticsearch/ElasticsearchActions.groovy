@@ -1,8 +1,15 @@
 package cgoit.gradle.elasticsearch
 
 import de.undercouch.gradle.tasks.download.DownloadAction
+import groovy.io.FileType
 import groovy.json.JsonSlurper
 import org.gradle.api.Project
+
+import java.nio.file.DirectoryStream
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import java.nio.file.Path
+import java.util.stream.Collectors
 
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.CYAN
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.NORMAL
@@ -249,11 +256,36 @@ class ElasticsearchActions {
             ant.untar(src: elasticFile, dest: "$home", compression: "gzip") {
                 cutdirsmapper(dirs: 1)
             }
-            ant.chmod(file: new File("$home/bin/elasticsearch"), perm: "+x")
-            ant.chmod(file: new File("$home/bin/plugin"), perm: "+x")
-            ant.chmod(file: new File("$home/modules/x-pack-ml/platform/linux-x86_64/bin/controller"), perm: "+x")
+            getBinFolders(home).each {
+                DirectoryStream<Path> stream
+                try {
+                    stream = Files.newDirectoryStream(it.toPath())
+                    for (Path path : stream) {
+                        if (!Files.isDirectory(path)) {
+                            ant.chmod(file: path.toAbsolutePath(), perm: "+x")
+                        }
+                    }
+                } finally {
+                    if (stream) {
+                        try {
+                            stream.close()
+                            stream = null
+                        } catch (Exception) {}
+                    }
+                }
+            }
         }
 
         new File("$home/version.txt") << "$version"
+    }
+
+    private static List<File> getBinFolders(File home) {
+        List<File> dirs = []
+        def addToList = {
+            dirs << it
+        }
+        def filterBinDirectories = ~/^bin$/
+        home.traverse type: FileType.DIRECTORIES, visit: addToList, nameFilter: filterBinDirectories
+        dirs
     }
 }

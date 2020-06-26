@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "cgoit.gradle.elasticsearch"
-version = "0.2.3"
+version = "0.2.3.1"
 
 String repoName = 'gradle-elasticsearch-plugin'
 
