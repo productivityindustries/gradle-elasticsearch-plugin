@@ -8,18 +8,20 @@ cache:
     - ".autoconf"
     - "$HOME/.m2"
     - "$HOME/.cache"
+    - "$HOME/.gradle"
 script: ./gradlew build
 jobs:
   include:
     - stage: Deploy to bintray
       jdk: openjdk8
       script: skip
-      if: tag is present
+      if: tag IS present
       deploy:
         provider: script
         script: ./gradlew publishPlugins
         on:
           tag: true
+          all_branches: true
 env:
   global:
     - secure: Vha2bAijHipu+C6pXCVy5aHGx3GXmidZS4WcIxO6CR1d3vm3ZMvfL6kEn4ddfRDUhBPlzvATFa1UvPqsjD/WKVGvVDblE3hKy40UmfEjhKepl5Pve57Az3GcaPVQC2LPrNibW6os29XTDybf6PnMHm0B6cPK34tWrbqigfxriNaibdWpCrd41ahzE9+cWidGaYSKkTRquYGWL0/aYrEAIggh9R/vhL2KbVm+/VBMOnNsZq+Wfqhq/UHhCg/4FLEBWZZjgABubIhSLyzr4CdgOazLDI2Wd3uMWJcO5ufim8h7OMR/180G2woG1VrVFdJNJQBqi4CON02S0oxkg8QN7j0D3IVje6R+6TSkJxyjVu3TwePRTwDhqwp7tZcS2XE25B09KTeU+E03k2KcQamLlyg8riqmV9F+31Y7qerD8DnMT/N6NywREuRIGYadQniXEV+MzlbAz3JzEGMT/b02rkaZ1GOqnllTmIORkTrVg/V7GE76biakMLICB7m7CeEOhsxhVs3uNHHCXFffONX4hC3N5UnpSyrZb1mptKGNfzACHc45u3NMnqE/elbTEiXJhab/kQPXBZjsfXa070CaqbZ20R10aTilrl4OrHHucMJCRlrvITGJo1X9OZxsQfVuCDcJe8lrO0T9+Af5y0BX+roRIyrEmyker4oetlx92gI=
