@@ -129,7 +129,8 @@ class StartElasticsearchAction {
 
         def esEnv = [
                 "JAVA_HOME=${System.properties['java.home']}",
-                "ES_HOME=$elastic.home"
+                "ES_HOME=$elastic.home",
+                "CHECK_KEYSTORE=false"
         ]
 
         if (isFamily(FAMILY_WINDOWS)) {

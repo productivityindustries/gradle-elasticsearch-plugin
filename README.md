@@ -15,7 +15,7 @@ Plugin setup with gradle >= 2.1:
 ```gradle
 
     plugins {
-        id "cgoit.gradle.elasticsearch" version "0.2.2"
+        id "cgoit.gradle.elasticsearch" version "0.2.3"
     }
 ```
 
@@ -29,7 +29,7 @@ Plugin setup with gradle < 2.1:
             maven { url "http://dl.bintray.com/cgoit/maven" }
         }
         dependencies {
-            classpath("cgoit.gradle.elasticsearch:gradle-elasticsearch-plugin:0.2.2")
+            classpath("cgoit.gradle.elasticsearch:gradle-elasticsearch-plugin:0.2.3")
         }
     }
 
@@ -49,7 +49,7 @@ Plugin setup with gradle < 2.1:
 
       doFirst {
         startElasticsearch {
-          elasticsearchVersion = "7.3.0"
+          elasticsearchVersion = "7.8.0"
           httpScheme = "http"
           httpHost = "localhost"
           httpPort = 9200
