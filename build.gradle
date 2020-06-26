@@ -10,6 +10,7 @@ buildscript {
 
 plugins {
     id "com.jfrog.bintray" version "1.8.5"
+    id "java-gradle-plugin"
 }
 
 group = "cgoit.gradle.elasticsearch"
@@ -102,23 +103,27 @@ bintray {
     }
 }
 
+// Use java-gradle-plugin to generate plugin descriptors and specify plugin ids
+gradlePlugin {
+    plugins {
+        elasticsearchPlugin {
+            id = project.group
+            implementationClass = 'cgoit.gradle.elasticsearch.ElasticsearchPlugin'
+        }
+    }
+}
+
 pluginBundle {
     website = "https://github.com/cgoIT/$repoName"
     vcsUrl = "https://github.com/cgoIT/${repoName}.git"
     description = 'An ElasticSearch gradle plugin for starting an ElasticSearch within a gradle build.'
-    tags = ['elastic', 'ElasticSearch']
 
     plugins {
-        greetingsPlugin {
-            id = project.group
+        elasticsearchPlugin {
             displayName = 'Gradle ElasticSearch plugin'
+            tags = ['elastic', 'ElasticSearch']
+            version = project.version
         }
-    }
-
-    mavenCoordinates {
-        groupId = project.group
-        artifactId = project.name
-        version = project.version
     }
 }
 
