@@ -7,6 +7,7 @@ class ElasticsearchPlugin implements Plugin<Project> {
     static final String DEFAULT_ELASTICSEARCH_VERSION = '7.8.0'
     static final String DEFAULT_ELASTICSEARCH_SCHEME = 'http'
     static final String DEFAULT_ELASTICSEARCH_HOST = 'localhost'
+    static final String DEFAULT_ELASTICSEARCH_NETWORK_HOST = '127.0.0.1'
     static final Integer DEFAULT_ELASTICSEARCH_PORT = 9200
     static final Integer DEFAULT_ELASTICSEARCH_TRANSPORT_PORT = 9300
 
