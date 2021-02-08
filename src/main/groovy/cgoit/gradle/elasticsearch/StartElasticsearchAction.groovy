@@ -11,6 +11,7 @@ import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEAR
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_PORT
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_SCHEME
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_TRANSPORT_PORT
+import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_NETWORK_HOST
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_VERSION
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.DEFAULT_ELASTICSEARCH_VERSION
 import static cgoit.gradle.elasticsearch.ElasticsearchPlugin.NORMAL
@@ -40,6 +41,10 @@ class StartElasticsearchAction {
     @Input
     @Optional
     Integer transportPort
+
+    @Input
+    @Optional
+    String networkHost
 
     @Input
     @Optional
@@ -73,6 +78,7 @@ class StartElasticsearchAction {
         httpHost = httpHost ?: DEFAULT_ELASTICSEARCH_HOST
         httpPort = httpPort ?: DEFAULT_ELASTICSEARCH_PORT
         transportPort = transportPort ?: DEFAULT_ELASTICSEARCH_TRANSPORT_PORT
+        networkHost = networkHost ?: DEFAULT_ELASTICSEARCH_NETWORK_HOST
         dataDir = dataDir ?: new File("$project.buildDir/elastic")
         File tmpDir = new File("$project.buildDir/elastic/tmp")
         logsDir = logsDir ?: new File("$dataDir/logs")
@@ -113,6 +119,7 @@ class StartElasticsearchAction {
                 esScript.absolutePath,
                 "${optPrefix}http.port=$httpPort",
                 "${optPrefix}transport.tcp.port=$transportPort",
+                "${optPrefix}network.host=$networkHost",
                 "${optPrefix}path.data=$dataDir",
                 "${optPrefix}path.repo=$dataDir/repo",
                 "${optPrefix}path.logs=$logsDir",
